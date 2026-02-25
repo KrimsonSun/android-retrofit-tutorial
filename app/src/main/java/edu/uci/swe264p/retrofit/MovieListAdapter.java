@@ -44,7 +44,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Movie movie = mData.get(position);
-        
+
         holder.tvTitle.setText(movie.getTitle() != null ? movie.getTitle() : "No Title");
         holder.tvReleaseDate.setText(movie.getReleaseDate() != null ? movie.getReleaseDate() : "");
         holder.tvVote.setText(movie.getVoteAverage() != null ? String.valueOf(movie.getVoteAverage()) : "0.0");
@@ -52,11 +52,25 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
 
         if (movie.getPosterPath() != null && !movie.getPosterPath().isEmpty()) {
             String posterUrl = "https://image.tmdb.org/t/p/w500" + movie.getPosterPath();
-            Picasso.get()
-                    .load(posterUrl)
+
+            Picasso picasso = Picasso.get();
+            picasso.setIndicatorsEnabled(true);
+            picasso.setLoggingEnabled(true);
+
+            picasso.load(posterUrl)
                     .placeholder(android.R.drawable.ic_menu_gallery)
                     .error(android.R.drawable.ic_menu_report_image)
-                    .into(holder.ivMovie);
+                    .into(holder.ivMovie, new com.squareup.picasso.Callback() {
+                        @Override
+                        public void onSuccess() {
+                            android.util.Log.d("Picasso", "Successfully loaded image: " + posterUrl);
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            android.util.Log.e("Picasso", "Failed to load image: " + posterUrl, e);
+                        }
+                    });
         } else {
             holder.ivMovie.setImageResource(android.R.drawable.ic_menu_gallery);
         }
