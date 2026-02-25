@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate: Starting MainActivity");
-        
+
         try {
             setContentView(R.layout.activity_main);
         } catch (Exception e) {
@@ -72,10 +72,10 @@ public class MainActivity extends AppCompatActivity {
                         .addConverterFactory(GsonConverterFactory.create())
                         .build();
             }
-            
+
             MovieApiService movieApiService = retrofit.create(MovieApiService.class);
             Call<Movie> call = movieApiService.getMovie(603, API_KEY);
-            
+
             call.enqueue(new Callback<Movie>() {
                 @Override
                 public void onResponse(Call<Movie> call, Response<Movie> response) {
@@ -99,9 +99,18 @@ public class MainActivity extends AppCompatActivity {
     private void updateUI(Movie movie) {
         setTextSafe(R.id.txtTitle, movie.getTitle());
         setTextSafe(R.id.txtReleaseDate, movie.getReleaseDate());
-        setTextSafe(R.id.txtPoster, movie.getPosterPath());
         setTextSafe(R.id.txtVote, movie.getVoteAverage() != null ? movie.getVoteAverage().toString() : "0.0");
         setTextSafe(R.id.txtOverview, movie.getOverview());
+
+        android.widget.ImageView imgPoster = findViewById(R.id.imgPoster);
+        if (imgPoster != null && movie.getPosterPath() != null) {
+            String posterUrl = "https://image.tmdb.org/t/p/w500" + movie.getPosterPath();
+            com.squareup.picasso.Picasso.get()
+                    .load(posterUrl)
+                    .placeholder(android.R.drawable.ic_menu_gallery)
+                    .error(android.R.drawable.ic_menu_report_image)
+                    .into(imgPoster);
+        }
     }
 
     private void setTextSafe(int viewId, String text) {
